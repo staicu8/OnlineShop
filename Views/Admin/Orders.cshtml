@@ -1,0 +1,36 @@
+@model IEnumerable<Order>
+@{ ViewData["Title"] = "Gestiune Comenzi"; }
+
+<h1 class="mb-4">📋 Gestiune Comenzi</h1>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Utilizator</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Data</th>
+                <th>Acțiuni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td>#@order.Id</td>
+                    <td>@order.User?.FirstName @order.User?.LastName</td>
+                    <td>@order.TotalAmount.ToString("F2") RON</td>
+                    <td>
+                        <span class="badge bg-info">@order.Status</span>
+                    </td>
+                    <td>@order.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>
+                        <a href="@Url.Action("OrderDetails", "Admin", new { id = order.Id })" class="btn btn-sm btn-info">Detalii</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

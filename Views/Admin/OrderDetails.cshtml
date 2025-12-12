@@ -1,0 +1,112 @@
+@model Order
+@{ ViewData["Title"] = "Detalii Comandă #" + Model.Id; }
+
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <h1>📋 Detalii Comandă #@Model.Id</h1>
+    <a href="@Url.Action("Orders", "Admin")" class="btn btn-secondary">← Înapoi la Comenzi</a>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Informații Comandă</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>ID Comandă:</strong> #@Model.Id</p>
+                <p><strong>Data:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</p>
+                <p><strong>Status:</strong> <span class="badge bg-info">@Model.Status</span></p>
+                <p><strong>Total:</strong> <span class="text-primary fw-bold">@Model.TotalAmount.ToString("F2") RON</span></p>
+                <p><strong>Adresa Livrare:</strong> @(Model.ShippingAddress ?? "N/A")</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Informații Client</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.User != null)
+                {
+                    <p><strong>Nume:</strong> @Model.User.FirstName @Model.User.LastName</p>
+                    <p><strong>Email:</strong> @Model.User.Email</p>
+                }
+                else
+                {
+                    <p class="text-muted">Client necunoscut</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">Produse Comandate</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Produs</th>
+                    <th>Preț Unitar</th>
+                    <th>Cantitate</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.OrderItems != null && Model.OrderItems.Any())
+                {
+                    @foreach (var item in Model.OrderItems)
+                    {
+                        <tr>
+                            <td>
+                                @if (item.Product != null)
+                                {
+                                    <a href="@Url.Action("Details", "Products", new { id = item.ProductId })" target="_blank">
+                                        @item.Product.Title
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Produs șters</span>
+                                }
+                            </td>
+                            <td>@item.UnitPrice.ToString("F2") RON</td>
+                            <td>@item.Quantity</td>
+                            <td><strong>@((item.UnitPrice * item.Quantity).ToString("F2")) RON</strong></td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">Nu există produse în această comandă.</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot class="table-light">
+                <tr>
+                    <th colspan="3" class="text-end">Total:</th>
+                    <th class="text-primary">@Model.TotalAmount.ToString("F2") RON</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<div class="mt-3">
+    <form asp-action="UpdateOrderStatus" method="post" class="d-inline">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <select name="status" class="form-select d-inline" style="width: auto;">
+            <option value="Pending" selected="@(Model.Status == "Pending")">Pending</option>
+            <option value="Processing" selected="@(Model.Status == "Processing")">Processing</option>
+            <option value="Shipped" selected="@(Model.Status == "Shipped")">Shipped</option>
+            <option value="Delivered" selected="@(Model.Status == "Delivered")">Delivered</option>
+            <option value="Cancelled" selected="@(Model.Status == "Cancelled")">Cancelled</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Actualizează Status</button>
+    </form>
+</div>

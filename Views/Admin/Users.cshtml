@@ -1,0 +1,63 @@
+@model IEnumerable<ApplicationUser>
+@{ ViewData["Title"] = "Gestiune Utilizatori"; }
+
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <h1>👥 Gestiune Utilizatori</h1>
+    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-secondary">← Dashboard</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Email</th>
+                <th>Nume</th>
+                <th>Prenume</th>
+                <th>Data Înregistrării</th>
+                <th>Rol Curent</th>
+                <th>Schimbă Rol</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                var currentRole = ViewBag.UserRoles[user.Id] as string ?? "User";
+                <tr>
+                    <td>@user.Email</td>
+                    <td>@user.LastName</td>
+                    <td>@user.FirstName</td>
+                    <td>@user.CreatedAt.ToString("dd.MM.yyyy")</td>
+                    <td>
+                        @if (currentRole.Contains("Admin"))
+                        {
+                            <span class="badge bg-danger">Admin</span>
+                        }
+                        else if (currentRole.Contains("Collaborator"))
+                        {
+                            <span class="badge bg-warning text-dark">Collaborator</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">User</span>
+                        }
+                    </td>
+                    <td>
+                        <form asp-action="ChangeUserRole" method="post" class="d-flex gap-2">
+                            <input type="hidden" name="userId" value="@user.Id" />
+                            <select name="newRole" class="form-select form-select-sm" style="width: auto;">
+                                @foreach (var role in (ViewBag.AvailableRoles as string[]) ?? Array.Empty<string>())
+                                {
+                                    <option value="@role" selected="@(currentRole.Contains(role))">@role</option>
+                                }
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-primary" 
+                                    onclick="return confirm('Sigur vrei să schimbi rolul acestui utilizator?')">
+                                Schimbă
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,74 @@
+@model IEnumerable<Review>
+@{ ViewData["Title"] = "Gestiune Review-uri"; }
+
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <h1>📝 Gestiune Review-uri</h1>
+    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-secondary">← Dashboard</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Nu există review-uri.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Produs</th>
+                    <th>Utilizator</th>
+                    <th>Rating</th>
+                    <th>Text</th>
+                    <th>Data</th>
+                    <th>Acțiuni</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var review in Model)
+                {
+                    <tr>
+                        <td>#@review.Id</td>
+                        <td>
+                            <a href="@Url.Action("Details", "Products", new { id = review.ProductId })" target="_blank">
+                                @review.Product?.Title
+                            </a>
+                        </td>
+                        <td>@review.User?.Email</td>
+                        <td>
+                            @if (review.Rating.HasValue)
+                            {
+                                <span>@review.Rating ⭐</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(review.Text))
+                            {
+                                <span title="@review.Text">
+                                    @(review.Text.Length > 50 ? review.Text.Substring(0, 50) + "..." : review.Text)
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>@review.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>
+                            <form asp-action="DeleteReview" asp-route-id="@review.Id" method="post" style="display:inline">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Sigur vrei să ștergi acest review?')">
+                                    🗑️ Șterge
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
