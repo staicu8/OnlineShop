@@ -34,5 +34,4 @@ dotnet build
 dotnet run
 ```
 
-## Scope
-Portfolio-ready academic project demonstrating practical full-stack development in .NET.
+
